@@ -149,22 +149,22 @@ FORMULAS FOR STOCHASTIC GRADIENT DESCENT
 <table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
 <thead>
 <tr>
-<th>Formula / Operation</th>
-<th>LaTeX Representation</th>
-<th>Code Calculation Line</th>
+<th>Operation</th>
+<th>Mathematical Formula (Clean LaTeX)</th>
+<th>Code Line</th>
 </tr>
 </thead>
 <tbody>
 
 <tr>
-<td><b>Model Input</b></td>
+<td><b>Transformed Input</b></td>
 <td>
 \[
-x' = \phi_0 + 0.06 \, \phi_1 \, x
+z = \phi_0 + 0.06\,\phi_1\,x
 \]
 </td>
 <td>
-<pre>x = phi[0] + 0.06 * phi[1] * x</pre>
+<pre>z = phi[0] + 0.06 * phi[1] * x</pre>
 </td>
 </tr>
 
@@ -172,11 +172,11 @@ x' = \phi_0 + 0.06 \, \phi_1 \, x
 <td><b>Sine Component</b></td>
 <td>
 \[
-\sin(x')
+\sin(z)
 \]
 </td>
 <td>
-<pre>sin_component = np.sin(phi[0] + 0.06 * phi[1] * x)</pre>
+<pre>sin_component = np.sin(z)</pre>
 </td>
 </tr>
 
@@ -184,11 +184,11 @@ x' = \phi_0 + 0.06 \, \phi_1 \, x
 <td><b>Gaussian Component</b></td>
 <td>
 \[
-\exp\left(-\frac{{x'}^2}{32}\right)
+\exp\!\left(-\frac{z^{2}}{32}\right)
 \]
 </td>
 <td>
-<pre>gauss_component = np.exp(-(x') * (x') / 32)</pre>
+<pre>gauss_component = np.exp(-(z*z)/32)</pre>
 </td>
 </tr>
 
@@ -196,7 +196,7 @@ x' = \phi_0 + 0.06 \, \phi_1 \, x
 <td><b>Model Output</b></td>
 <td>
 \[
-\hat{y} = \sin(x') \, \exp\left(-\frac{{x'}^2}{32}\right)
+\hat{y} = \sin(z)\,\exp\!\left(-\frac{z^{2}}{32}\right)
 \]
 </td>
 <td>
@@ -208,7 +208,7 @@ x' = \phi_0 + 0.06 \, \phi_1 \, x
 <td><b>Loss Function (SSE)</b></td>
 <td>
 \[
-L = \sum_{i=1}^{N} (\hat{y}_i - y_i)^2
+L = \sum_{i=1}^N (\hat{y}_{i} - y_{i})^{2}
 \]
 </td>
 <td>
@@ -217,45 +217,88 @@ L = \sum_{i=1}^{N} (\hat{y}_i - y_i)^2
 </tr>
 
 <tr>
-<td><b>Gradient (Derivative w.r.t φ₀)</b></td>
+<td><b>Residual</b></td>
 <td>
 \[
-\frac{\partial L}{\partial \phi_0}
-=
-2 \sum_i 
-\left(\sin(x')e^{-x'^2/32} - y_i\right)
-\left[
-\cos(x')e^{-x'^2/32}
--
-\sin(x')e^{-x'^2/32}\frac{x'}{16}
-\right]
+e_i = \hat{y}_i - y_i
 \]
 </td>
 <td>
-<pre>deriv = 2 * deriv * (sin_component * gauss_component - y)</pre>
+<pre>error = y_pred - data_y</pre>
 </td>
 </tr>
 
 <tr>
-<td><b>Gradient (Derivative w.r.t φ₁)</b></td>
+<td><b>Derivative of Model w.r.t φ₀</b></td>
 <td>
 \[
-\frac{\partial L}{\partial \phi_1}
+\frac{\partial \hat{y}}{\partial \phi_0}
 =
-2 \sum_i 
-\left(\sin(x')e^{-x'^2/32} - y_i\right)
-\left[
-0.06 x_i
-\left(
-\cos(x')e^{-x'^2/32}
+\cos(z)\,\exp\!\left(-\frac{z^{2}}{32}\right)
 -
-\sin(x')e^{-x'^2/32}\frac{x'}{16}
+\sin(z)\,\exp\!\left(-\frac{z^{2}}{32}\right)
+\cdot
+\frac{z}{16}
+\]
+</td>
+<td>
+<pre>cos(z)*gauss - sin(z)*gauss*(z/16)</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Derivative of Loss w.r.t φ₀</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \phi_0}
+=
+2\sum_{i}
+e_i
+\left(
+\frac{\partial \hat{y}_i}{\partial \phi_0}
 \right)
+\]
+</td>
+<td>
+<pre>2 * deriv * (y_pred - y)</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Derivative of Model w.r.t φ₁</b></td>
+<td>
+\[
+\frac{\partial \hat{y}}{\partial \phi_1}
+=
+0.06 x\,
+\left[
+\cos(z)\,\exp\!\left(-\frac{z^{2}}{32}\right)
+-
+\sin(z)\,\exp\!\left(-\frac{z^{2}}{32}\right)
+\cdot
+\frac{z}{16}
 \right]
 \]
 </td>
 <td>
-<pre>deriv = 2 * deriv * (sin_component * gauss_component - y)</pre>
+<pre>0.06*x*(cos(z)*gauss - sin(z)*gauss*(z/16))</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Derivative of Loss w.r.t φ₁</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \phi_1}
+=
+2\sum_i e_i
+\left(
+\frac{\partial \hat{y}_i}{\partial \phi_1}
+\right)
+\]
+</td>
+<td>
+<pre>2*deriv*(y_pred - y)</pre>
 </td>
 </tr>
 
@@ -265,13 +308,13 @@ L = \sum_{i=1}^{N} (\hat{y}_i - y_i)^2
 \[
 \nabla L =
 \begin{bmatrix}
-\partial L/\partial \phi_0 \\
-\partial L/\partial \phi_1
+\frac{\partial L}{\partial \phi_0}\\[4pt]
+\frac{\partial L}{\partial \phi_1}
 \end{bmatrix}
 \]
 </td>
 <td>
-<pre>gradient = np.array([[dl_dphi0],[dl_dphi1]])</pre>
+<pre>gradient = [[dl_dphi0],[dl_dphi1]]</pre>
 </td>
 </tr>
 
@@ -288,10 +331,10 @@ L = \sum_{i=1}^{N} (\hat{y}_i - y_i)^2
 </tr>
 
 <tr>
-<td><b>Stochastic Mini-Batch Selection</b></td>
+<td><b>Mini-Batch Sampling</b></td>
 <td>
 \[
-B = \{(x_i, y_i) : i \in \text{random subset}\}
+B = \{(x_i, y_i)\ :\ i\in \text{random subset}\}
 \]
 </td>
 <td>
@@ -303,7 +346,7 @@ B = \{(x_i, y_i) : i \in \text{random subset}\}
 <td><b>SGD Update Rule</b></td>
 <td>
 \[
-\phi \leftarrow \phi - \alpha \, \nabla L_B
+\phi \leftarrow \phi - \alpha \nabla L_B
 \]
 </td>
 <td>
@@ -313,5 +356,4 @@ B = \{(x_i, y_i) : i \in \text{random subset}\}
 
 </tbody>
 </table>
-
 
