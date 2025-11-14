@@ -3,6 +3,8 @@ CMPE 460 Deep Learning University Lesson
 
 These Notebooks has taken from https://github.com/udlbook/udlbook/tree/main/Notebooks and completed for this lesson.
 
+Latex formulas can be converted into mathematical expressions with the help of an LLM.
+
 FORMULAS FOR GRADIENT DESCENT
 
 <table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
