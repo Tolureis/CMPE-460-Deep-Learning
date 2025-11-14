@@ -1848,230 +1848,118 @@ v_t = \beta_2 v_{t-1} + (1-\beta_2)g_t^2
 
 FORMULAS FOR DOUBLE DESCENT 
 
-<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%; font-size:16px;">
   <thead>
     <tr>
-      <th>Concept</th>
-      <th>Mathematical Formula (LaTeX)</th>
-      <th>Code (where it is computed)</th>
+      <th style="width:25%;">Concept</th>
+      <th style="width:45%;">Mathematical Formula (LaTeX)</th>
+      <th style="width:30%;">Code Line</th>
     </tr>
   </thead>
   <tbody>
 
-    <!-- DATA & NOISE -->
-
-    <tr>
-      <td><b>Label noise (15%)</b></td>
-      <td>
-        \[
-        y_i' =
-        \begin{cases}
-          y_i & \text{with prob. } 0.85 \\
-          \text{Uniform}\{0,\dots,9\} & \text{with prob. } 0.15
-        \end{cases}
-        \]
-      </td>
-      <td>
-        <pre>
-for c_y in range(len(data['y'])):
-    if random.random() &lt; 0.15:
-        data['y'][c_y] = int(random.random() * 10)
-        </pre>
-      </td>
-    </tr>
-
-    <!-- MLP FORWARD PASS -->
-
     <tr>
       <td><b>Layer 1 pre-activation</b></td>
-      <td>
-        \[
-        \mathbf{f}_1 = W_1 \mathbf{x} + \mathbf{b}_1
-        \]
-      </td>
-      <td>
-        <pre>nn.Linear(D_i, D_k)</pre>
-      </td>
+      <td>\( f_1 = W_1 x + b_1 \)</td>
+      <td><code>pred = model(x_batch)</code></td>
     </tr>
 
     <tr>
       <td><b>Layer 1 activation (ReLU)</b></td>
-      <td>
-        \[
-        \mathbf{h}_1 = \text{ReLU}(\mathbf{f}_1)
-        = \max(0,\mathbf{f}_1)
-        \]
-      </td>
-      <td>
-        <pre>nn.ReLU()</pre>
-      </td>
+      <td>\( h_1 = \max(0, f_1) \)</td>
+      <td><code>nn.ReLU()</code></td>
     </tr>
 
     <tr>
       <td><b>Layer 2 pre-activation</b></td>
-      <td>
-        \[
-        \mathbf{f}_2 = W_2 \mathbf{h}_1 + \mathbf{b}_2
-        \]
-      </td>
-      <td>
-        <pre>nn.Linear(D_k, D_k)</pre>
-      </td>
+      <td>\( f_2 = W_2 h_1 + b_2 \)</td>
+      <td><code>nn.Linear(D_k, D_k)</code></td>
     </tr>
 
     <tr>
       <td><b>Layer 2 activation (ReLU)</b></td>
-      <td>
-        \[
-        \mathbf{h}_2 = \text{ReLU}(\mathbf{f}_2)
-        = \max(0,\mathbf{f}_2)
-        \]
-      </td>
-      <td>
-        <pre>nn.ReLU()</pre>
-      </td>
+      <td>\( h_2 = \max(0, f_2) \)</td>
+      <td><code>nn.ReLU()</code></td>
     </tr>
 
     <tr>
-      <td><b>Output layer (logits)</b></td>
-      <td>
-        \[
-        \mathbf{z} = W_3 \mathbf{h}_2 + \mathbf{b}_3,
-        \qquad \mathbf{z} \in \mathbb{R}^{10}
-        \]
-      </td>
-      <td>
-        <pre>nn.Linear(D_k, D_o)</pre>
-      </td>
+      <td><b>Output logits</b></td>
+      <td>\( z = W_3 h_2 + b_3 \)</td>
+      <td><code>nn.Linear(D_k, D_o)</code></td>
     </tr>
 
-    <!-- SOFTMAX + CE LOSS -->
-
     <tr>
-      <td><b>Softmax probabilities</b></td>
-      <td>
-        \[
-        p_i = \frac{e^{z_i}}{\sum_{j=1}^{10} e^{z_j}}
-        \]
-      </td>
-      <td>
-        <pre>loss_function = nn.CrossEntropyLoss()</pre>
-      </td>
+      <td><b>Softmax probability</b></td>
+      <td>\( p_i = \frac{e^{z_i}}{\sum_j e^{z_j}} \)</td>
+      <td><code>loss = nn.CrossEntropyLoss()</code></td>
     </tr>
 
     <tr>
       <td><b>Cross-entropy loss</b></td>
-      <td>
-        \[
-        \mathcal{L}(\mathbf{z}, y)
-        = -\log p_{y}
-        \]
-      </td>
-      <td>
-        <pre>loss = loss_function(pred, y_batch)</pre>
-      </td>
-    </tr>
-
-    <!-- SGD + MOMENTUM -->
-
-    <tr>
-      <td><b>Gradient of parameters</b></td>
-      <td>
-        \[
-        g_t = \nabla_{\theta} \mathcal{L}(\theta_t)
-        \]
-      </td>
-      <td>
-        <pre>loss.backward()</pre>
-      </td>
+      <td>\( \mathcal{L} = -\log(p_y) \)</td>
+      <td><code>loss = loss_function(pred, y_batch)</code></td>
     </tr>
 
     <tr>
-      <td><b>SGD with momentum</b></td>
-      <td>
-        \[
-        v_t = \mu v_{t-1} + g_t
-        \]
-        \[
-        \theta_{t+1} = \theta_t - \eta v_t
-        \]
-        with learning rate \(\eta = 0.01\), momentum \(\mu = 0.9\).
-      </td>
-      <td>
-        <pre>optimizer = torch.optim.SGD(model.parameters(),
-                             lr=0.01, momentum=0.9)
-optimizer.step()</pre>
-      </td>
+      <td><b>Gradient of loss</b></td>
+      <td>\( g_t = \nabla_\theta \mathcal{L}(\theta_t) \)</td>
+      <td><code>loss.backward()</code></td>
     </tr>
 
-    <!-- PREDICTION & ERROR -->
+    <tr>
+      <td><b>SGD + Momentum (velocity update)</b></td>
+      <td>
+        \( v_t = \mu v_{t-1} + g_t \)
+      </td>
+      <td><code>optimizer = SGD(..., momentum=0.9)</code></td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter update</b></td>
+      <td>
+        \( \theta_{t+1} = \theta_t - \eta v_t \)
+      </td>
+      <td><code>optimizer.step()</code></td>
+    </tr>
 
     <tr>
       <td><b>Prediction (argmax)</b></td>
-      <td>
-        \[
-        \hat{y} = \arg\max_i z_i
-        \]
-      </td>
-      <td>
-        <pre>_, pred_train_cls = torch.max(pred_train, 1)</pre>
-      </td>
+      <td>\( \hat{y} = \arg\max_i z_i \)</td>
+      <td><code>_, pred_cls = torch.max(pred, 1)</code></td>
     </tr>
 
     <tr>
-      <td><b>Accuracy and error (%)</b></td>
+      <td><b>Accuracy</b></td>
       <td>
-        \[
-        \text{Accuracy} =
-        \frac{\text{correct}}{\text{total}}
-        \times 100
-        \]
-        \[
-        \text{Error} = 100 - \text{Accuracy}
-        \]
+        \( \text{Acc} = \frac{\text{Correct}}{\text{Total}} \)
       </td>
-      <td>
-        <pre>train_err = 100 - 100 * (pred_train_cls == y_train).float().mean().item()</pre>
-      </td>
+      <td><code>(pred == y).sum()</code></td>
     </tr>
 
-    <!-- PARAMETER COUNT -->
-
     <tr>
-      <td><b>Total trainable parameters</b></td>
+      <td><b>Error</b></td>
       <td>
-        \[
-        N_{\text{params}} =
-        \sum_{l=1}^{3}
-        \bigl(
-          d^{(l)}_{\text{out}} \cdot d^{(l)}_{\text{in}}
-          + d^{(l)}_{\text{out}}
-        \bigr)
-        \]
+        \( \text{Err} = 1 - \text{Acc} \)
       </td>
-      <td>
-        <pre>def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)</pre>
-      </td>
+      <td><code>test_err = 100 - accuracy</code></td>
     </tr>
 
-    <!-- DOUBLE DESCENT CRITICAL POINT -->
+    <tr>
+      <td><b>Total parameters</b></td>
+      <td>
+        \( N = \sum_l (d^{out}_l \cdot d^{in}_l + d^{out}_l ) \)
+      </td>
+      <td><code>count_parameters(model)</code></td>
+    </tr>
 
     <tr>
-      <td><b>Critical capacity (N(weights) ≈ N(train))</b></td>
+      <td><b>Double Descent Critical Point</b></td>
       <td>
-        \[
-        N_{\text{params}} \approx N_{\text{train}}
-        \]
+        \( N_{\text{params}} \approx N_{\text{train}} \)
       </td>
-      <td>
-        <pre>
-num_training_examples = len(data['y'])
-closest_index = np.argmin(np.abs(total_weights_all - num_training_examples))
-hidden_at_equal_N = hidden_variables[closest_index]
-plt.axvline(x=hidden_at_equal_N, ...)</pre>
-      </td>
+      <td><code>closest_index = argmin(|W - N|)</code></td>
     </tr>
 
   </tbody>
 </table>
+
