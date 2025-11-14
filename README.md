@@ -1848,134 +1848,212 @@ v_t = \beta_2 v_{t-1} + (1-\beta_2)g_t^2
 
 FORMULAS FOR DOUBLE DESCENT 
 
-<table border="1" cellpadding="10" style="border-collapse: collapse; width:100%; font-size:16px;">
-  <thead>
-    <tr>
-      <th style="width:25%; text-align:center;">Concept</th>
-      <th style="width:45%; text-align:center;">Mathematical Formula (LaTeX)</th>
-      <th style="width:30%; text-align:center;">Code Line</th>
-    </tr>
-  </thead>
-  <tbody>
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Concept</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Code Line</th>
+</tr>
+</thead>
+<tbody>
 
-    <tr>
-      <td>Input vector</td>
-      <td>\[ x \in \mathbb{R}^{40} \]</td>
-      <td><pre><code>x_batch.shape == (100, 40)</code></pre></td>
-    </tr>
+<tr>
+<td><b>Input vector (first 40 dims)</b></td>
+<td>
+\[
+x \in \mathbb{R}^{40}
+\]
+</td>
+<td>
+<pre>images = images.view(... )[:, :D_i]</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Layer 1 pre-activation</td>
-      <td>\[ f^{(1)} = W^{(1)} x + b^{(1)} \]</td>
-      <td><pre><code>nn.Linear(D_i, D_k)</code></pre></td>
-    </tr>
+<tr>
+<td><b>Layer 1 pre-activation</b></td>
+<td>
+\[
+f^{(1)} = W^{(1)} x + b^{(1)}
+\]
+</td>
+<td>
+<pre>nn.Linear(D_i, D_k)</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Layer 1 activation (ReLU)</td>
-      <td>\[ h^{(1)} = \max(0, f^{(1)}) \]</td>
-      <td><pre><code>nn.ReLU()</code></pre></td>
-    </tr>
+<tr>
+<td><b>Layer 1 activation (ReLU)</b></td>
+<td>
+\[
+h^{(1)} = \max(0, f^{(1)})
+\]
+</td>
+<td>
+<pre>nn.ReLU()</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Layer 2 pre-activation</td>
-      <td>\[ f^{(2)} = W^{(2)} h^{(1)} + b^{(2)} \]</td>
-      <td><pre><code>nn.Linear(D_k, D_k)</code></pre></td>
-    </tr>
+<tr>
+<td><b>Layer 2 pre-activation</b></td>
+<td>
+\[
+f^{(2)} = W^{(2)} h^{(1)} + b^{(2)}
+\]
+</td>
+<td>
+<pre>nn.Linear(D_k, D_k)</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Layer 2 activation (ReLU)</td>
-      <td>\[ h^{(2)} = \max(0, f^{(2)}) \]</td>
-      <td><pre><code>nn.ReLU()</code></pre></td>
-    </tr>
+<tr>
+<td><b>Layer 2 activation (ReLU)</b></td>
+<td>
+\[
+h^{(2)} = \max(0, f^{(2)})
+\]
+</td>
+<td>
+<pre>nn.ReLU()</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Output logits</td>
-      <td>\[ z = W^{(3)} h^{(2)} + b^{(3)} \]</td>
-      <td><pre><code>nn.Linear(D_k, D_o)</code></pre></td>
-    </tr>
+<tr>
+<td><b>Output logits</b></td>
+<td>
+\[
+z = W^{(3)} h^{(2)} + b^{(3)}
+\]
+</td>
+<td>
+<pre>nn.Linear(D_k, D_o)</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Softmax probability</td>
-      <td>\[
-      p_i = \frac{e^{z_i}}{\sum_{j=1}^{10} e^{z_j}}
-      \]</td>
-      <td><pre><code>loss = nn.CrossEntropyLoss()</code></pre></td>
-    </tr>
+<tr>
+<td><b>Softmax probabilities</b></td>
+<td>
+\[
+p_i = \frac{e^{z_i}}{\sum_{j=1}^{10} e^{z_j}}
+\]
+</td>
+<td>
+<pre>loss = nn.CrossEntropyLoss()</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Cross-entropy loss</td>
-      <td>\[
-      \mathcal{L} = -\log(p_y)
-      \]</td>
-      <td><pre><code>loss = loss_function(pred, y_batch)</code></pre></td>
-    </tr>
+<tr>
+<td><b>Cross-entropy loss</b></td>
+<td>
+\[
+\mathcal{L} = -\log(p_y)
+\]
+</td>
+<td>
+<pre>loss = loss_function(pred, y_batch)</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Loss gradient</td>
-      <td>\[
-      g_t = \nabla_\theta \mathcal{L}(\theta_t)
-      \]</td>
-      <td><pre><code>loss.backward()</code></pre></td>
-    </tr>
+<tr>
+<td><b>Loss gradient</b></td>
+<td>
+\[
+g_t = \nabla_\theta \mathcal{L}
+\]
+</td>
+<td>
+<pre>loss.backward()</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>SGD + momentum (velocity)</td>
-      <td>\[
-      v_t = \mu v_{t-1} + g_t
-      \]</td>
-      <td><pre><code>optimizer = SGD(... momentum=0.9)</code></pre></td>
-    </tr>
+<tr>
+<td><b>SGD + Momentum</b></td>
+<td>
+\[
+v_t = \mu v_{t-1} + g_t
+\]
+</td>
+<td>
+<pre>optimizer = SGD(..., momentum=0.9)</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Weight update rule</td>
-      <td>\[
-      \theta_{t+1}
-      = \theta_t - \eta v_t
-      \]</td>
-      <td><pre><code>optimizer.step()</code></pre></td>
-    </tr>
+<tr>
+<td><b>Parameter update rule</b></td>
+<td>
+\[
+\theta_{t+1} = \theta_t - \eta v_t
+\]
+</td>
+<td>
+<pre>optimizer.step()</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Prediction (argmax)</td>
-      <td>\[
-      \hat{y} = \arg\max_i z_i
-      \]</td>
-      <td><pre><code>_, pred = torch.max(outputs, 1)</code></pre></td>
-    </tr>
+<tr>
+<td><b>Prediction</b></td>
+<td>
+\[
+\hat{y} = \arg\max_i z_i
+\]
+</td>
+<td>
+<pre>_, predicted = torch.max(outputs, 1)</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Accuracy</td>
-      <td>\[
-      \text{Acc} = \frac{\text{Correct}}{N}
-      \]</td>
-      <td><pre><code>(pred == labels).sum()</code></pre></td>
-    </tr>
+<tr>
+<td><b>Accuracy</b></td>
+<td>
+\[
+\text{Acc} = \frac{\text{Correct}}{N}
+\]
+</td>
+<td>
+<pre>(predicted == labels).sum()</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Error</td>
-      <td>\[
-      \text{Err} = 1 - \text{Acc}
-      \]</td>
-      <td><pre><code>test_err = 100 - accuracy</code></pre></td>
-    </tr>
+<tr>
+<td><b>Error</b></td>
+<td>
+\[
+\text{Err} = 1 - \text{Acc}
+\]
+</td>
+<td>
+<pre>test_err = 100 - accuracy</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Total parameters</td>
-      <td>\[
-      N = \sum_{l} (d_l^{out} d_l^{in} + d_l^{out})
-      \]</td>
-      <td><pre><code>count_parameters(model)</code></pre></td>
-    </tr>
+<tr>
+<td><b>Total trainable parameters</b></td>
+<td>
+\[
+N_{\text{params}}
+=
+\sum_l \left(d^{\text{out}}_l d^{\text{in}}_l + d^{\text{out}}_l\right)
+\]
+</td>
+<td>
+<pre>count_parameters(model)</pre>
+</td>
+</tr>
 
-    <tr>
-      <td>Double descent critical point</td>
-      <td>\[
-      N_{\text{params}} = N_{\text{train}}
-      \]</td>
-      <td><pre><code>closest_index = argmin(|W - N|)</code></pre></td>
-    </tr>
+<tr>
+<td><b>Double Descent Critical Point</b></td>
+<td>
+\[
+N_{\text{params}} = N_{\text{train}}
+\]
+</td>
+<td>
+<pre>closest_index = np.argmin(abs(W - N))</pre>
+</td>
+</tr>
 
-  </tbody>
+</tbody>
 </table>
+
 
 
