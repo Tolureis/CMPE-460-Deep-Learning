@@ -357,3 +357,144 @@ B = \{(x_i, y_i)\ :\ i\in \text{random subset}\}
 </tbody>
 </table>
 
+FORMULAS FOR LINE SEARCH
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Operation</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Code Line</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+<td><b>Loss Function</b></td>
+<td>
+\[
+L(\phi)
+= 1
+- 0.5\, e^{ -\frac{(\phi - 0.65)^2}{0.1} }
+- 0.45\, e^{ -\frac{(\phi - 0.35)^2}{0.02} }
+\]
+</td>
+<td>
+<pre>return 1 - 0.5*np.exp(-(phi-0.65)**2/0.1) - 0.45*np.exp(-(phi-0.35)**2/0.02)</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Initial Interval Points</b></td>
+<td>
+\[
+a=0,\quad b=0.33,\quad c=0.66,\quad d=1
+\]
+</td>
+<td>
+<pre>a=0; b=0.33; c=0.66; d=1.0</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Evaluate Function Values</b></td>
+<td>
+\[
+L(a),\,L(b),\,L(c),\,L(d)
+\]
+</td>
+<td>
+<pre>lossa = loss_function(a)</pre>
+<pre>lossb = loss_function(b)</pre>
+<pre>lossc = loss_function(c)</pre>
+<pre>lossd = loss_function(d)</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Rule #1 (If A is the minimum)</b></td>
+<td>
+\[
+\text{If } L(a) < L(b),L(c),L(d):\quad
+\begin{aligned}
+b' &= a + \frac{b-a}{2} \\
+c' &= a + \frac{c-a}{2} \\
+d' &= a + \frac{d-a}{2}
+\end{aligned}
+\]
+</td>
+<td>
+<pre>b = a + (b - a) / 2</pre>
+<pre>c = a + (c - a) / 2</pre>
+<pre>d = a + (d - a) / 2</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Rule #2 (If B < C)</b></td>
+<td>
+\[
+\text{If } L(b) < L(c):\quad
+\begin{aligned}
+d' &= c \\
+b' &= a + \frac{1}{3}(d'-a) \\
+c' &= a + \frac{2}{3}(d'-a)
+\end{aligned}
+\]
+</td>
+<td>
+<pre>d = c</pre>
+<pre>b = a + (d - a) / 3</pre>
+<pre>c = a + 2 * (d - a) / 3</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Rule #3 (If C < B)</b></td>
+<td>
+\[
+\text{If } L(c) < L(b):\quad
+\begin{aligned}
+a' &= b \\
+b' &= a' + \frac{1}{3}(d-a') \\
+c' &= a' + \frac{2}{3}(d-a')
+\end{aligned}
+\]
+</td>
+<td>
+<pre>a = b</pre>
+<pre>b = a + (d - a) / 3</pre>
+<pre>c = a + 2 * (d - a) / 3</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Stopping Criterion</b></td>
+<td>
+\[
+|b-c| \le \text{threshold}
+\quad\text{or}\quad
+\text{iteration limit reached}
+\]
+</td>
+<td>
+<pre>while np.abs(b-c) > thresh and n_iter < max_iter:</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Final Solution</b></td>
+<td>
+\[
+\phi^\* = \frac{b + c}{2}
+\]
+</td>
+<td>
+<pre>soln = (b + c) / 2</pre>
+</td>
+</tr>
+
+</tbody>
+</table>
+
+
