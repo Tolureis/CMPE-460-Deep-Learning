@@ -497,4 +497,233 @@ c' &= a' + \frac{2}{3}(d-a')
 </tbody>
 </table>
 
+FORMULAS FOR MOMENTUM
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Operation</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Code Line (Exact Calculation)</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- MODEL -->
+
+<tr>
+<td><b>Transformed Input</b></td>
+<td>
+\[
+z = \phi_0 + 0.06\,\phi_1\,x
+\]
+</td>
+<td><pre>z = phi[0] + 0.06 * phi[1] * x</pre></td>
+</tr>
+
+<tr>
+<td><b>Sine Component</b></td>
+<td>
+\[
+\sin(z)
+\]
+</td>
+<td><pre>sin_component = np.sin(z)</pre></td>
+</tr>
+
+<tr>
+<td><b>Gaussian Component</b></td>
+<td>
+\[
+\exp\!\left(-\frac{z^2}{32}\right)
+\]
+</td>
+<td><pre>gauss_component = np.exp(-(z*z)/32)</pre></td>
+</tr>
+
+<tr>
+<td><b>Model Output</b></td>
+<td>
+\[
+\hat{y} = \sin(z)\,\exp\!\left(-\frac{z^2}{32}\right)
+\]
+</td>
+<td><pre>y_pred = sin_component * gauss_component</pre></td>
+</tr>
+
+<!-- LOSS -->
+
+<tr>
+<td><b>Loss Function (SSE)</b></td>
+<td>
+\[
+L = \sum_{i=1}^N (\hat{y}_i - y_i)^2
+\]
+</td>
+<td><pre>loss = np.sum((pred_y - data_y)**2)</pre></td>
+</tr>
+
+<tr>
+<td><b>Residual</b></td>
+<td>
+\[
+e_i = \hat{y}_i - y_i
+\]
+</td>
+<td><pre>e = pred_y - data_y</pre></td>
+</tr>
+
+<!-- GRADIENTS -->
+
+<tr>
+<td><b>∂ŷ/∂φ₀</b></td>
+<td>
+\[
+\frac{\partial \hat{y}}{\partial \phi_0}
+=
+\cos(z)e^{-z^{2}/32}
+-
+\sin(z)e^{-z^{2}/32}\frac{z}{16}
+\]
+</td>
+<td><pre>deriv = cos(z)*gauss - sin(z)*gauss*(z/16)</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂φ₀</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \phi_0}
+=
+2\sum_i e_i
+\left(
+\frac{\partial \hat{y}_i}{\partial \phi_0}
+\right)
+\]
+</td>
+<td><pre>deriv = 2 * deriv * (sin_component*gauss_component - y)</pre></td>
+</tr>
+
+<tr>
+<td><b>∂ŷ/∂φ₁</b></td>
+<td>
+\[
+\frac{\partial \hat{y}}{\partial \phi_1}
+=
+0.06 x\,
+\left[
+\cos(z)e^{-z^{2}/32}
+-
+\sin(z)e^{-z^{2}/32}\frac{z}{16}
+\right]
+\]
+</td>
+<td><pre>deriv = 0.06*x*(cos(z)*gauss - sin(z)*gauss*(z/16))</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂φ₁</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \phi_1}
+=
+2\sum_i e_i
+\left(
+\frac{\partial \hat{y}_i}{\partial \phi_1}
+\right)
+\]
+</td>
+<td><pre>deriv = 2*deriv*(sin_component*gauss_component - y)</pre></td>
+</tr>
+
+<tr>
+<td><b>Gradient Vector</b></td>
+<td>
+\[
+\nabla L(\phi)
+=
+\begin{bmatrix}
+\frac{\partial L}{\partial \phi_0} \\
+\frac{\partial L}{\partial \phi_1}
+\end{bmatrix}
+\]
+</td>
+<td><pre>gradient = np.array([[dl_dphi0],[dl_dphi1]])</pre></td>
+</tr>
+
+<!-- SGD UPDATE -->
+
+<tr>
+<td><b>Standard SGD Update</b></td>
+<td>
+\[
+\phi \leftarrow \phi - \alpha \nabla L
+\]
+</td>
+<td><pre>phi = phi - alpha * gradient</pre></td>
+</tr>
+
+<!-- MOMENTUM -->
+
+<tr>
+<td><b>Momentum Update (Equation 6.11)</b></td>
+<td>
+\[
+v_t = \beta v_{t-1} + \nabla L(\phi_t)
+\]
+\[
+\phi_{t+1} = \phi_t - \alpha v_t
+\]
+</td>
+<td>
+<pre>momentum = beta * momentum + gradient</pre>
+<pre>phi = phi - alpha * momentum</pre>
+</td>
+</tr>
+
+<!-- NESTEROV -->
+
+<tr>
+<td><b>Nesterov Lookahead</b></td>
+<td>
+\[
+\tilde{\phi} = \phi_t - \beta v_{t}
+\]
+</td>
+<td><pre>lookahead_phi = phi - beta * momentum</pre></td>
+</tr>
+
+<tr>
+<td><b>Nesterov Gradient</b></td>
+<td>
+\[
+\nabla L(\tilde{\phi})
+\]
+</td>
+<td><pre>gradient = compute_gradient(..., lookahead_phi)</pre></td>
+</tr>
+
+<tr>
+<td><b>Nesterov Momentum Update</b></td>
+<td>
+\[
+v_t = \beta v_{t-1} + \nabla L(\tilde{\phi})
+\]
+</td>
+<td><pre>momentum = beta * momentum + gradient</pre></td>
+</tr>
+
+<tr>
+<td><b>Nesterov Parameter Update</b></td>
+<td>
+\[
+\phi_{t+1} = \phi_t - \alpha v_t
+\]
+</td>
+<td><pre>phi = phi - alpha * momentum</pre></td>
+</tr>
+
+</tbody>
+</table>
+
 
