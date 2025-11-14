@@ -1846,3 +1846,232 @@ v_t = \beta_2 v_{t-1} + (1-\beta_2)g_t^2
 </tbody>
 </table>
 
+FORMULAS FOR DOUBLE DESCENT 
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+  <thead>
+    <tr>
+      <th>Concept</th>
+      <th>Mathematical Formula (LaTeX)</th>
+      <th>Code (where it is computed)</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- DATA & NOISE -->
+
+    <tr>
+      <td><b>Label noise (15%)</b></td>
+      <td>
+        \[
+        y_i' =
+        \begin{cases}
+          y_i & \text{with prob. } 0.85 \\
+          \text{Uniform}\{0,\dots,9\} & \text{with prob. } 0.15
+        \end{cases}
+        \]
+      </td>
+      <td>
+        <pre>
+for c_y in range(len(data['y'])):
+    if random.random() &lt; 0.15:
+        data['y'][c_y] = int(random.random() * 10)
+        </pre>
+      </td>
+    </tr>
+
+    <!-- MLP FORWARD PASS -->
+
+    <tr>
+      <td><b>Layer 1 pre-activation</b></td>
+      <td>
+        \[
+        \mathbf{f}_1 = W_1 \mathbf{x} + \mathbf{b}_1
+        \]
+      </td>
+      <td>
+        <pre>nn.Linear(D_i, D_k)</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Layer 1 activation (ReLU)</b></td>
+      <td>
+        \[
+        \mathbf{h}_1 = \text{ReLU}(\mathbf{f}_1)
+        = \max(0,\mathbf{f}_1)
+        \]
+      </td>
+      <td>
+        <pre>nn.ReLU()</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Layer 2 pre-activation</b></td>
+      <td>
+        \[
+        \mathbf{f}_2 = W_2 \mathbf{h}_1 + \mathbf{b}_2
+        \]
+      </td>
+      <td>
+        <pre>nn.Linear(D_k, D_k)</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Layer 2 activation (ReLU)</b></td>
+      <td>
+        \[
+        \mathbf{h}_2 = \text{ReLU}(\mathbf{f}_2)
+        = \max(0,\mathbf{f}_2)
+        \]
+      </td>
+      <td>
+        <pre>nn.ReLU()</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Output layer (logits)</b></td>
+      <td>
+        \[
+        \mathbf{z} = W_3 \mathbf{h}_2 + \mathbf{b}_3,
+        \qquad \mathbf{z} \in \mathbb{R}^{10}
+        \]
+      </td>
+      <td>
+        <pre>nn.Linear(D_k, D_o)</pre>
+      </td>
+    </tr>
+
+    <!-- SOFTMAX + CE LOSS -->
+
+    <tr>
+      <td><b>Softmax probabilities</b></td>
+      <td>
+        \[
+        p_i = \frac{e^{z_i}}{\sum_{j=1}^{10} e^{z_j}}
+        \]
+      </td>
+      <td>
+        <pre>loss_function = nn.CrossEntropyLoss()</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Cross-entropy loss</b></td>
+      <td>
+        \[
+        \mathcal{L}(\mathbf{z}, y)
+        = -\log p_{y}
+        \]
+      </td>
+      <td>
+        <pre>loss = loss_function(pred, y_batch)</pre>
+      </td>
+    </tr>
+
+    <!-- SGD + MOMENTUM -->
+
+    <tr>
+      <td><b>Gradient of parameters</b></td>
+      <td>
+        \[
+        g_t = \nabla_{\theta} \mathcal{L}(\theta_t)
+        \]
+      </td>
+      <td>
+        <pre>loss.backward()</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>SGD with momentum</b></td>
+      <td>
+        \[
+        v_t = \mu v_{t-1} + g_t
+        \]
+        \[
+        \theta_{t+1} = \theta_t - \eta v_t
+        \]
+        with learning rate \(\eta = 0.01\), momentum \(\mu = 0.9\).
+      </td>
+      <td>
+        <pre>optimizer = torch.optim.SGD(model.parameters(),
+                             lr=0.01, momentum=0.9)
+optimizer.step()</pre>
+      </td>
+    </tr>
+
+    <!-- PREDICTION & ERROR -->
+
+    <tr>
+      <td><b>Prediction (argmax)</b></td>
+      <td>
+        \[
+        \hat{y} = \arg\max_i z_i
+        \]
+      </td>
+      <td>
+        <pre>_, pred_train_cls = torch.max(pred_train, 1)</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Accuracy and error (%)</b></td>
+      <td>
+        \[
+        \text{Accuracy} =
+        \frac{\text{correct}}{\text{total}}
+        \times 100
+        \]
+        \[
+        \text{Error} = 100 - \text{Accuracy}
+        \]
+      </td>
+      <td>
+        <pre>train_err = 100 - 100 * (pred_train_cls == y_train).float().mean().item()</pre>
+      </td>
+    </tr>
+
+    <!-- PARAMETER COUNT -->
+
+    <tr>
+      <td><b>Total trainable parameters</b></td>
+      <td>
+        \[
+        N_{\text{params}} =
+        \sum_{l=1}^{3}
+        \bigl(
+          d^{(l)}_{\text{out}} \cdot d^{(l)}_{\text{in}}
+          + d^{(l)}_{\text{out}}
+        \bigr)
+        \]
+      </td>
+      <td>
+        <pre>def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)</pre>
+      </td>
+    </tr>
+
+    <!-- DOUBLE DESCENT CRITICAL POINT -->
+
+    <tr>
+      <td><b>Critical capacity (N(weights) ≈ N(train))</b></td>
+      <td>
+        \[
+        N_{\text{params}} \approx N_{\text{train}}
+        \]
+      </td>
+      <td>
+        <pre>
+num_training_examples = len(data['y'])
+closest_index = np.argmin(np.abs(total_weights_all - num_training_examples))
+hidden_at_equal_N = hidden_variables[closest_index]
+plt.axvline(x=hidden_at_equal_N, ...)</pre>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
