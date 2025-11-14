@@ -1698,4 +1698,151 @@ where
 </tbody>
 </table>
 
+FORMULAS FOR MNIST 1D PERFORMANCE
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Concept</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Code Line</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+<td><b>Input flattening</b></td>
+<td>
+\[
+x \in \mathbb{R}^{784},\quad 
+x_{\text{used}} = x_{0:40}
+\]
+</td>
+<td><pre>images = images.view(... )[:, :D_i]</pre></td>
+</tr>
+
+<tr>
+<td><b>Layer 1 pre-activation</b></td>
+<td>
+\[
+f^{(1)} = W^{(1)} x + b^{(1)}
+\]
+</td>
+<td><pre>nn.Linear(D_i, D_k)</pre></td>
+</tr>
+
+<tr>
+<td><b>Layer 1 activation (ReLU)</b></td>
+<td>
+\[
+h^{(1)} = \max(0, f^{(1)})
+\]
+</td>
+<td><pre>nn.ReLU()</pre></td>
+</tr>
+
+<tr>
+<td><b>Layer 2 pre-activation</b></td>
+<td>
+\[
+f^{(2)} = W^{(2)} h^{(1)} + b^{(2)}
+\]
+</td>
+<td><pre>nn.Linear(D_k, D_k)</pre></td>
+</tr>
+
+<tr>
+<td><b>Layer 2 activation (ReLU)</b></td>
+<td>
+\[
+h^{(2)} = \max(0, f^{(2)})
+\]
+</td>
+<td><pre>nn.ReLU()</pre></td>
+</tr>
+
+<tr>
+<td><b>Output layer</b></td>
+<td>
+\[
+z = W^{(3)} h^{(2)} + b^{(3)} \in \mathbb{R}^{10}
+\]
+</td>
+<td><pre>nn.Linear(D_k, D_o)</pre></td>
+</tr>
+
+<tr>
+<td><b>Softmax (implicit, inside CrossEntropyLoss)</b></td>
+<td>
+\[
+p_i = 
+\frac{e^{z_i}}{\sum_{j=1}^{10} e^{z_j}}
+\]
+</td>
+<td><pre>criterion = nn.CrossEntropyLoss()</pre></td>
+</tr>
+
+<tr>
+<td><b>Loss (Cross-Entropy)</b></td>
+<td>
+\[
+\mathcal{L} = -\log p_{y}
+\]
+</td>
+<td><pre>loss = criterion(outputs, labels)</pre></td>
+</tr>
+
+<tr>
+<td><b>Gradient computation</b></td>
+<td>
+\[
+W \leftarrow 
+W - \eta \frac{\partial \mathcal{L}}{\partial W}
+\]
+</td>
+<td><pre>loss.backward()</pre></td>
+</tr>
+
+<tr>
+<td><b>Weight update (Adam)</b></td>
+<td>
+Adam update rules:
+\[
+m_t = \beta_1 m_{t-1} + (1-\beta_1)g_t
+\]
+\[
+v_t = \beta_2 v_{t-1} + (1-\beta_2)g_t^2
+\]
+\[
+\theta_t = 
+\theta_{t-1}
+- \alpha \frac{m_t}{\sqrt{v_t}+\epsilon}
+\]
+</td>
+<td><pre>optimizer.step()</pre></td>
+</tr>
+
+<tr>
+<td><b>Prediction</b></td>
+<td>
+\[
+\hat{y} = \arg\max_i z_i
+\]
+</td>
+<td><pre>_, predicted = torch.max(outputs.data, 1)</pre></td>
+</tr>
+
+<tr>
+<td><b>Accuracy</b></td>
+<td>
+\[
+\text{acc} = 
+\frac{\text{correct}}{\text{total}}
+\]
+</td>
+<td><pre>correct += (predicted == labels).sum()</pre></td>
+</tr>
+
+</tbody>
+</table>
 
