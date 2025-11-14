@@ -920,3 +920,270 @@ v_t = \gamma v_{t-1} + (1-\gamma)(\nabla L(\phi_t))^2
 </tbody>
 </table>
 
+FORMULAS FOR BACKPROPAGATION WITH TOY MODEL
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Exact Code Line</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- FORWARD PASS -->
+
+<tr>
+<td><b>f₀</b></td>
+<td>
+\[
+f_0 = \beta_0 + \omega_0 x
+\]
+</td>
+<td><pre>f0 = beta0 + omega0 * x</pre></td>
+</tr>
+
+<tr>
+<td><b>h₁ = sin(f₀)</b></td>
+<td>
+\[
+h_1 = \sin(f_0)
+\]
+</td>
+<td><pre>h1 = np.sin(f0)</pre></td>
+</tr>
+
+<tr>
+<td><b>f₁</b></td>
+<td>
+\[
+f_1 = \beta_1 + \omega_1 h_1
+\]
+</td>
+<td><pre>f1 = beta1 + omega1 * h1</pre></td>
+</tr>
+
+<tr>
+<td><b>h₂ = exp(f₁)</b></td>
+<td>
+\[
+h_2 = \exp(f_1)
+\]
+</td>
+<td><pre>h2 = np.exp(f1)</pre></td>
+</tr>
+
+<tr>
+<td><b>f₂</b></td>
+<td>
+\[
+f_2 = \beta_2 + \omega_2 h_2
+\]
+</td>
+<td><pre>f2 = beta2 + omega2 * h2</pre></td>
+</tr>
+
+<tr>
+<td><b>h₃ = cos(f₂)</b></td>
+<td>
+\[
+h_3 = \cos(f_2)
+\]
+</td>
+<td><pre>h3 = np.cos(f2)</pre></td>
+</tr>
+
+<tr>
+<td><b>f₃</b></td>
+<td>
+\[
+f_3 = \beta_3 + \omega_3 h_3
+\]
+</td>
+<td><pre>f3 = beta3 + omega3 * h3</pre></td>
+</tr>
+
+<tr>
+<td><b>Loss</b></td>
+<td>
+\[
+L = (f_3 - y)^2
+\]
+</td>
+<td><pre>l_i = (f3 - y)**2</pre></td>
+</tr>
+
+<!-- BACKWARD PASS -->
+
+<tr>
+<td><b>dL/df₃</b></td>
+<td>
+\[
+\frac{\partial L}{\partial f_3}
+= 2 (f_3 - y)
+\]
+</td>
+<td><pre>dldf3 = 2 * (f3 - y)</pre></td>
+</tr>
+
+<tr>
+<td><b>dL/dh₃</b></td>
+<td>
+\[
+\frac{\partial L}{\partial h_3}
+= \omega_3 \frac{\partial L}{\partial f_3}
+\]
+</td>
+<td><pre>dldh3 = omega3 * dldf3</pre></td>
+</tr>
+
+<tr>
+<td><b>dL/df₂</b></td>
+<td>
+\[
+\frac{\partial L}{\partial f_2}
+= -\sin(f_2)\,\frac{\partial L}{\partial h_3}
+\]
+</td>
+<td><pre>dldf2 = (-np.sin(f2)) * dldh3</pre></td>
+</tr>
+
+<tr>
+<td><b>dL/dh₂</b></td>
+<td>
+\[
+\frac{\partial L}{\partial h_2}
+= \omega_2 \frac{\partial L}{\partial f_2}
+\]
+</td>
+<td><pre>dldh2 = omega2 * dldf2</pre></td>
+</tr>
+
+<tr>
+<td><b>dL/df₁</b></td>
+<td>
+\[
+\frac{\partial L}{\partial f_1}
+= e^{f_1}\,\frac{\partial L}{\partial h_2}
+\]
+</td>
+<td><pre>dldf1 = np.exp(f1) * dldh2</pre></td>
+</tr>
+
+<tr>
+<td><b>dL/dh₁</b></td>
+<td>
+\[
+\frac{\partial L}{\partial h_1}
+= \omega_1 \frac{\partial L}{\partial f_1}
+\]
+</td>
+<td><pre>dldh1 = omega1 * dldf1</pre></td>
+</tr>
+
+<tr>
+<td><b>dL/df₀</b></td>
+<td>
+\[
+\frac{\partial L}{\partial f_0}
+= \cos(f_0)\,\frac{\partial L}{\partial h_1}
+\]
+</td>
+<td><pre>dldf0 = np.cos(f0) * dldh1</pre></td>
+</tr>
+
+<!-- PARAMETER GRADIENTS -->
+
+<tr>
+<td><b>∂L/∂β₃</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \beta_3}
+= \frac{\partial L}{\partial f_3}
+\]
+</td>
+<td><pre>dldbeta3 = dldf3</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂ω₃</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \omega_3}
+= h_3 \frac{\partial L}{\partial f_3}
+\]
+</td>
+<td><pre>dldomega3 = dldf3 * h3</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂β₂</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \beta_2}
+= \frac{\partial L}{\partial f_2}
+\]
+</td>
+<td><pre>dldbeta2 = dldf2</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂ω₂</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \omega_2}
+= h_2 \frac{\partial L}{\partial f_2}
+\]
+</td>
+<td><pre>dldomega2 = dldf2 * h2</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂β₁</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \beta_1}
+= \frac{\partial L}{\partial f_1}
+\]
+</td>
+<td><pre>dldbeta1 = dldf1</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂ω₁</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \omega_1}
+= h_1 \frac{\partial L}{\partial f_1}
+\]
+</td>
+<td><pre>dldomega1 = dldf1 * h1</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂β₀</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \beta_0}
+= \frac{\partial L}{\partial f_0}
+\]
+</td>
+<td><pre>dldbeta0 = dldf0</pre></td>
+</tr>
+
+<tr>
+<td><b>∂L/∂ω₀</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \omega_0}
+= x \frac{\partial L}{\partial f_0}
+\]
+</td>
+<td><pre>dldomega0 = dldf0 * x</pre></td>
+</tr>
+
+</tbody>
+</table>
+
+
