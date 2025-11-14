@@ -726,4 +726,197 @@ v_t = \beta v_{t-1} + \nabla L(\tilde{\phi})
 </tbody>
 </table>
 
+FORMULAS FOR ADAM OPTIMIZER
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Operation</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Code Line (Exact Calculation)</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- LOSS FUNCTION -->
+
+<tr>
+<td><b>Loss Function</b></td>
+<td>
+\[
+L(\phi_0,\phi_1)
+= 1 - 
+\exp\!\left(-2\phi_1^2\right)
+\exp\!\left(-\frac{(\phi_0 - 0.7)^2}{8}\right)
+\]
+</td>
+<td>
+<pre>height = exp(-0.5*(phi1*phi1)*4.0)*exp(-0.5*(phi0-0.7)**2/4.0)</pre>
+</td>
+</tr>
+
+<!-- FINITE DIFFERENCE GRADIENT -->
+
+<tr>
+<td><b>Finite Difference Gradient (φ₀)</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \phi_0}
+\approx
+\frac{
+L(\phi_0+\frac{\delta}{2},\phi_1)
+-
+L(\phi_0-\frac{\delta}{2},\phi_1)
+}{\delta}
+\]
+</td>
+<td>
+<pre>gradient[0] = (loss(phi0+δ/2, φ1) - loss(phi0-δ/2, φ1)) / δ</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Finite Difference Gradient (φ₁)</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \phi_1}
+\approx
+\frac{
+L(\phi_0,\phi_1+\frac{\delta}{2})
+-
+L(\phi_0,\phi_1-\frac{\delta}{2})
+}{\delta}
+\]
+</td>
+<td>
+<pre>gradient[1] = (loss(phi0, φ1+δ/2) - loss(phi0, φ1-δ/2)) / δ</pre>
+</td>
+</tr>
+
+<!-- STANDARD GRADIENT DESCENT -->
+
+<tr>
+<td><b>Standard Gradient Descent Update</b></td>
+<td>
+\[
+\phi_{t+1}
+=
+\phi_{t}
+-
+\alpha \nabla L(\phi_t)
+\]
+</td>
+<td>
+<pre>grad_path[:,t+1] = grad_path[:,t] - α * grad</pre>
+</td>
+</tr>
+
+<!-- NORMALIZED GRADIENT (ADAGRAD / RMSPROP STYLE) -->
+
+<tr>
+<td><b>Accumulated Squared Gradient</b></td>
+<td>
+\[
+v_t = v_{t-1} + (\nabla L(\phi_t))^2
+\]
+</td>
+<td>
+<pre>v = v + m*m</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Normalized Gradient Update</b></td>
+<td>
+\[
+\phi_{t+1}
+=
+\phi_t
+-
+\alpha
+\frac{
+\nabla L(\phi_t)
+}{
+\sqrt{v_t} + \epsilon
+}
+\]
+</td>
+<td>
+<pre>grad_path[:,t+1] = grad_path[:,t] - α*(m/(sqrt(v)+ε))</pre>
+</td>
+</tr>
+
+<!-- ADAM OPTIMIZER -->
+
+<tr>
+<td><b>Adam Momentum Estimate</b></td>
+<td>
+\[
+m_t = \beta m_{t-1} + (1-\beta) \nabla L(\phi_t)
+\]
+</td>
+<td>
+<pre>m = β*m + (1-β)*grad</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Adam Variance Estimate</b></td>
+<td>
+\[
+v_t = \gamma v_{t-1} + (1-\gamma)(\nabla L(\phi_t))^2
+\]
+</td>
+<td>
+<pre>v = γ*v + (1-γ)*grad*grad</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Bias-Corrected Momentum</b></td>
+<td>
+\[
+\tilde{m}_t = \frac{m_t}{1-\beta^{t}}
+\]
+</td>
+<td>
+<pre>m_tilde = m / (1 - β^(t+1))</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Bias-Corrected Variance</b></td>
+<td>
+\[
+\tilde{v}_t = \frac{v_t}{1-\gamma^{t}}
+\]
+</td>
+<td>
+<pre>v_tilde = v / (1 - γ^(t+1))</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Adam Parameter Update</b></td>
+<td>
+\[
+\phi_{t+1}
+=
+\phi_t
+-
+\alpha
+\frac{
+\tilde{m}_t
+}{
+\sqrt{\tilde{v}_t} + \epsilon
+}
+\]
+</td>
+<td>
+<pre>grad_path[:,t+1] = grad_path[:,t] - α*(m_tilde/(sqrt(v_tilde)+ε))</pre>
+</td>
+</tr>
+
+</tbody>
+</table>
 
