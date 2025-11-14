@@ -1332,3 +1332,101 @@ W_1 \leftarrow W_1 + \eta\, X^\top \delta_{\text{hidden}}
 </tbody>
 </table>
 
+FORMULAS FOR BACKPROPAGATION
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Backprop Equation</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Exact Code Line</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- 7.22 Bias Gradient -->
+<tr>
+<td><b>Eq. 7.22 — Gradient wrt Bias<br>( ∂L/∂b )</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \boldsymbol{\beta}_k}
+=
+\frac{\partial L}{\partial \mathbf{f}_k}
+\]
+</td>
+<td>
+<pre>all_dl_dbiases[layer] = np.array(all_dl_df[layer])</pre>
+</td>
+</tr>
+
+<!-- 7.23 Weight Gradient -->
+<tr>
+<td><b>Eq. 7.23 — Gradient wrt Weights<br>( ∂L/∂W )</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \boldsymbol{\Omega}_k}
+=
+\frac{\partial L}{\partial \mathbf{f}_k}\;
+\mathbf{h}_{k}^{\top}
+\]
+</td>
+<td>
+<pre>all_dl_dweights[layer] =
+    np.matmul(all_dl_df[layer], all_h[layer].T)</pre>
+</td>
+</tr>
+
+<!-- 7.25 Backprop Through Layers -->
+<tr>
+<td><b>Eq. 7.25 — Gradient wrt Activation<br>( ∂L/∂h )</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \mathbf{h}_k}
+=
+\boldsymbol{\Omega}_k^{\top}
+\frac{\partial L}{\partial \mathbf{f}_k}
+\]
+</td>
+<td>
+<pre>all_dl_dh[layer] =
+    np.matmul(all_weights[layer].T, all_dl_df[layer])</pre>
+</td>
+</tr>
+
+<tr>
+<td><b>Eq. 7.25 — Gradient wrt Pre-activation<br>( ∂L/∂f ) via ReLU</b></td>
+<td>
+\[
+\frac{\partial L}{\partial \mathbf{f}_k}
+=
+\frac{\partial L}{\partial \mathbf{h}_k}
+\odot
+\mathbf{1}_{\mathbf{f}_k > 0}
+\]
+</td>
+<td>
+<pre>all_dl_df[layer-1] =
+    all_dl_dh[layer] * indicator_function(all_f[layer-1])</pre>
+</td>
+</tr>
+
+<!-- ReLU derivative -->
+<tr>
+<td><b>ReLU Derivative</b></td>
+<td>
+\[
+\frac{d}{df}\mathrm{ReLU}(f)
+=
+\begin{cases}
+1 & f > 0 \\
+0 & f \le 0
+\end{cases}
+\]
+</td>
+<td>
+<pre>indicator_function(all_f[layer-1])</pre>
+</td>
+</tr>
+
+</tbody>
+</table>
