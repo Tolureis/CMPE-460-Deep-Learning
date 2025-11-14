@@ -1848,116 +1848,131 @@ v_t = \beta_2 v_{t-1} + (1-\beta_2)g_t^2
 
 FORMULAS FOR DOUBLE DESCENT 
 
-<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%; font-size:16px;">
+<table border="1" cellpadding="10" style="border-collapse: collapse; width:100%; font-size:16px;">
   <thead>
     <tr>
-      <th style="width:25%;">Concept</th>
-      <th style="width:45%;">Mathematical Formula (LaTeX)</th>
-      <th style="width:30%;">Code Line</th>
+      <th style="width:25%; text-align:center;">Concept</th>
+      <th style="width:45%; text-align:center;">Mathematical Formula (LaTeX)</th>
+      <th style="width:30%; text-align:center;">Code Line</th>
     </tr>
   </thead>
   <tbody>
 
     <tr>
-      <td><b>Layer 1 pre-activation</b></td>
-      <td>\( f_1 = W_1 x + b_1 \)</td>
-      <td><code>pred = model(x_batch)</code></td>
+      <td>Input vector</td>
+      <td>\[ x \in \mathbb{R}^{40} \]</td>
+      <td><pre><code>x_batch.shape == (100, 40)</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Layer 1 activation (ReLU)</b></td>
-      <td>\( h_1 = \max(0, f_1) \)</td>
-      <td><code>nn.ReLU()</code></td>
+      <td>Layer 1 pre-activation</td>
+      <td>\[ f^{(1)} = W^{(1)} x + b^{(1)} \]</td>
+      <td><pre><code>nn.Linear(D_i, D_k)</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Layer 2 pre-activation</b></td>
-      <td>\( f_2 = W_2 h_1 + b_2 \)</td>
-      <td><code>nn.Linear(D_k, D_k)</code></td>
+      <td>Layer 1 activation (ReLU)</td>
+      <td>\[ h^{(1)} = \max(0, f^{(1)}) \]</td>
+      <td><pre><code>nn.ReLU()</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Layer 2 activation (ReLU)</b></td>
-      <td>\( h_2 = \max(0, f_2) \)</td>
-      <td><code>nn.ReLU()</code></td>
+      <td>Layer 2 pre-activation</td>
+      <td>\[ f^{(2)} = W^{(2)} h^{(1)} + b^{(2)} \]</td>
+      <td><pre><code>nn.Linear(D_k, D_k)</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Output logits</b></td>
-      <td>\( z = W_3 h_2 + b_3 \)</td>
-      <td><code>nn.Linear(D_k, D_o)</code></td>
+      <td>Layer 2 activation (ReLU)</td>
+      <td>\[ h^{(2)} = \max(0, f^{(2)}) \]</td>
+      <td><pre><code>nn.ReLU()</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Softmax probability</b></td>
-      <td>\( p_i = \frac{e^{z_i}}{\sum_j e^{z_j}} \)</td>
-      <td><code>loss = nn.CrossEntropyLoss()</code></td>
+      <td>Output logits</td>
+      <td>\[ z = W^{(3)} h^{(2)} + b^{(3)} \]</td>
+      <td><pre><code>nn.Linear(D_k, D_o)</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Cross-entropy loss</b></td>
-      <td>\( \mathcal{L} = -\log(p_y) \)</td>
-      <td><code>loss = loss_function(pred, y_batch)</code></td>
+      <td>Softmax probability</td>
+      <td>\[
+      p_i = \frac{e^{z_i}}{\sum_{j=1}^{10} e^{z_j}}
+      \]</td>
+      <td><pre><code>loss = nn.CrossEntropyLoss()</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Gradient of loss</b></td>
-      <td>\( g_t = \nabla_\theta \mathcal{L}(\theta_t) \)</td>
-      <td><code>loss.backward()</code></td>
+      <td>Cross-entropy loss</td>
+      <td>\[
+      \mathcal{L} = -\log(p_y)
+      \]</td>
+      <td><pre><code>loss = loss_function(pred, y_batch)</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>SGD + Momentum (velocity update)</b></td>
-      <td>
-        \( v_t = \mu v_{t-1} + g_t \)
-      </td>
-      <td><code>optimizer = SGD(..., momentum=0.9)</code></td>
+      <td>Loss gradient</td>
+      <td>\[
+      g_t = \nabla_\theta \mathcal{L}(\theta_t)
+      \]</td>
+      <td><pre><code>loss.backward()</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Parameter update</b></td>
-      <td>
-        \( \theta_{t+1} = \theta_t - \eta v_t \)
-      </td>
-      <td><code>optimizer.step()</code></td>
+      <td>SGD + momentum (velocity)</td>
+      <td>\[
+      v_t = \mu v_{t-1} + g_t
+      \]</td>
+      <td><pre><code>optimizer = SGD(... momentum=0.9)</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Prediction (argmax)</b></td>
-      <td>\( \hat{y} = \arg\max_i z_i \)</td>
-      <td><code>_, pred_cls = torch.max(pred, 1)</code></td>
+      <td>Weight update rule</td>
+      <td>\[
+      \theta_{t+1}
+      = \theta_t - \eta v_t
+      \]</td>
+      <td><pre><code>optimizer.step()</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Accuracy</b></td>
-      <td>
-        \( \text{Acc} = \frac{\text{Correct}}{\text{Total}} \)
-      </td>
-      <td><code>(pred == y).sum()</code></td>
+      <td>Prediction (argmax)</td>
+      <td>\[
+      \hat{y} = \arg\max_i z_i
+      \]</td>
+      <td><pre><code>_, pred = torch.max(outputs, 1)</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Error</b></td>
-      <td>
-        \( \text{Err} = 1 - \text{Acc} \)
-      </td>
-      <td><code>test_err = 100 - accuracy</code></td>
+      <td>Accuracy</td>
+      <td>\[
+      \text{Acc} = \frac{\text{Correct}}{N}
+      \]</td>
+      <td><pre><code>(pred == labels).sum()</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Total parameters</b></td>
-      <td>
-        \( N = \sum_l (d^{out}_l \cdot d^{in}_l + d^{out}_l ) \)
-      </td>
-      <td><code>count_parameters(model)</code></td>
+      <td>Error</td>
+      <td>\[
+      \text{Err} = 1 - \text{Acc}
+      \]</td>
+      <td><pre><code>test_err = 100 - accuracy</code></pre></td>
     </tr>
 
     <tr>
-      <td><b>Double Descent Critical Point</b></td>
-      <td>
-        \( N_{\text{params}} \approx N_{\text{train}} \)
-      </td>
-      <td><code>closest_index = argmin(|W - N|)</code></td>
+      <td>Total parameters</td>
+      <td>\[
+      N = \sum_{l} (d_l^{out} d_l^{in} + d_l^{out})
+      \]</td>
+      <td><pre><code>count_parameters(model)</code></pre></td>
+    </tr>
+
+    <tr>
+      <td>Double descent critical point</td>
+      <td>\[
+      N_{\text{params}} = N_{\text{train}}
+      \]</td>
+      <td><pre><code>closest_index = argmin(|W - N|)</code></pre></td>
     </tr>
 
   </tbody>
