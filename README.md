@@ -2055,5 +2055,143 @@ N_{\text{params}} = N_{\text{train}}
 </tbody>
 </table>
 
+FORMULAS FOR HIGH DIMENSIONAL SPACES
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Concept</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Code Line</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- Distance ratio definition -->
+<tr>
+<td><b>Euclidean distance between two points</b></td>
+<td>
+\[
+d(\mathbf{x}_i, \mathbf{x}_j)
+= 
+\left\|\mathbf{x}_i - \mathbf{x}_j\right\|_2
+=
+\sqrt{\sum_{k=1}^{D} (x_{k,i}-x_{k,j})^2}
+\]
+</td>
+<td>
+<pre>d = np.linalg.norm(x[:, i] - x[:, j])</pre>
+</td>
+</tr>
+
+<!-- Distance ratio -->
+<tr>
+<td><b>Distance ratio (max / min)</b></td>
+<td>
+\[
+\text{ratio}
+=
+\frac{\max_{i<j} d(\mathbf{x}_i,\mathbf{x}_j)}
+     {\min_{i<j} d(\mathbf{x}_i,\mathbf{x}_j)}
+\]
+</td>
+<td>
+<pre>largest_dist / smallest_dist</pre>
+</td>
+</tr>
+
+<!-- Hypersphere volume -->
+<tr>
+<td><b>Volume of a D-dimensional hypersphere</b></td>
+<td>
+\[
+V_D(r)
+=
+\frac{\pi^{D/2}}{\Gamma\!\left(\frac{D}{2}+1\right)} \;
+r^D
+\]
+</td>
+<td>
+<pre>volume =
+(pi ** (dimensions/2)) *
+(radius ** dimensions) /
+sci.gamma((dimensions/2)+1)</pre>
+</td>
+</tr>
+
+<!-- Definition: diameter to radius -->
+<tr>
+<td><b>Radius from diameter</b></td>
+<td>
+\[
+r = \frac{d}{2}
+\]
+</td>
+<td>
+<pre>radius = diameter / 2.0</pre>
+</td>
+</tr>
+
+<!-- Outer 1% definition -->
+<tr>
+<td><b>Outer 1% region of hypersphere</b></td>
+<td>
+Region between radius:
+\[
+r_{\text{inner}} = 0.99,\quad
+r_{\text{outer}} = 1.0
+\]
+</td>
+<td>
+<pre>inner_vol = volume_of_hypersphere(0.99, d)</pre>
+</td>
+</tr>
+
+<!-- Proportion formula -->
+<tr>
+<td><b>Proportion of volume in outer 1%</b></td>
+<td>
+\[
+\text{Prop}
+=
+1 \;-\;
+\frac{V_D(0.99)}{V_D(1.0)}
+\]
+</td>
+<td>
+<pre>proportion = 1 - (inner_vol / full_vol)</pre>
+</td>
+</tr>
+
+<!-- Gamma function -->
+<tr>
+<td><b>Gamma function in hypersphere volume</b></td>
+<td>
+\[
+\Gamma(z)
+=
+\int_0^\infty t^{z-1} e^{-t}\,dt
+\]
+</td>
+<td>
+<pre>sci.gamma((dimensions/2)+1)</pre>
+</td>
+</tr>
+
+<!-- Sampling high dimensional normal -->
+<tr>
+<td><b>Sampling points in high-dimensional space</b></td>
+<td>
+\[
+\mathbf{x}_i \sim \mathcal{N}(0, I_D)
+\]
+</td>
+<td>
+<pre>x_100D = np.random.normal(size=(100, n_data))</pre>
+</td>
+</tr>
+
+</tbody>
+</table>
 
 
