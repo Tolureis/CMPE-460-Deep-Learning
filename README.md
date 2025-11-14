@@ -1978,3 +1978,4 @@ FORMULAS FOR DOUBLE DESCENT
   </tbody>
 </table>
 
+
