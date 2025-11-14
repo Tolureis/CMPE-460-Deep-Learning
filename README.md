@@ -1186,4 +1186,149 @@ L = (f_3 - y)^2
 </tbody>
 </table>
 
+FORMULAS FOR BASIC BACKPROPAGATION
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Operation</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Exact Code Line</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- SIGMOID -->
+
+<tr>
+<td><b>Sigmoid activation</b></td>
+<td>
+\[
+\sigma(x)=\frac{1}{1+e^{-x}}
+\]
+</td>
+<td><pre>hidden_output = sigmoid(hidden_input)</pre></td>
+</tr>
+
+<tr>
+<td><b>Sigmoid derivative</b></td>
+<td>
+\[
+\sigma'(x)=x(1-x) \quad \text{(where x = sigmoid output)}
+\]
+</td>
+<td><pre>d_output = error * sigmoid_derivative(final_output)</pre></td>
+</tr>
+
+<!-- FORWARD PASS -->
+
+<tr>
+<td><b>Hidden layer input</b></td>
+<td>
+\[
+h_{\text{in}} = X W_1
+\]
+</td>
+<td><pre>hidden_input = np.dot(X, W1)</pre></td>
+</tr>
+
+<tr>
+<td><b>Hidden layer output</b></td>
+<td>
+\[
+h_{\text{out}} = \sigma(h_{\text{in}})
+\]
+</td>
+<td><pre>hidden_output = sigmoid(hidden_input)</pre></td>
+</tr>
+
+<tr>
+<td><b>Output layer input</b></td>
+<td>
+\[
+o_{\text{in}} = h_{\text{out}} W_2
+\]
+</td>
+<td><pre>final_input = np.dot(hidden_output, W2)</pre></td>
+</tr>
+
+<tr>
+<td><b>Final output</b></td>
+<td>
+\[
+o_{\text{out}} = \sigma(o_{\text{in}})
+\]
+</td>
+<td><pre>final_output = sigmoid(final_input)</pre></td>
+</tr>
+
+<!-- LOSS -->
+
+<tr>
+<td><b>Error (Loss)</b></td>
+<td>
+\[
+E = y - o_{\text{out}}
+\]
+</td>
+<td><pre>error = y - final_output</pre></td>
+</tr>
+
+<!-- BACKPROP -->
+
+<tr>
+<td><b>Output gradient</b></td>
+<td>
+\[
+\delta_{\text{out}}
+= (y - o_{\text{out}})\,\sigma'(o_{\text{out}})
+\]
+</td>
+<td><pre>d_output = error * sigmoid_derivative(final_output)</pre></td>
+</tr>
+
+<tr>
+<td><b>Hidden layer error</b></td>
+<td>
+\[
+E_{\text{hidden}} = \delta_{\text{out}} W_2^\top
+\]
+</td>
+<td><pre>error_hidden = d_output.dot(W2.T)</pre></td>
+</tr>
+
+<tr>
+<td><b>Hidden layer gradient</b></td>
+<td>
+\[
+\delta_{\text{hidden}} = E_{\text{hidden}} \,\sigma'(h_{\text{out}})
+\]
+</td>
+<td><pre>d_hidden = error_hidden * sigmoid_derivative(hidden_output)</pre></td>
+</tr>
+
+<!-- WEIGHT UPDATES -->
+
+<tr>
+<td><b>Update W₂</b></td>
+<td>
+\[
+W_2 \leftarrow W_2 + \eta\, h_{\text{out}}^\top \delta_{\text{out}}
+\]
+</td>
+<td><pre>W2 += hidden_output.T.dot(d_output) * lr</pre></td>
+</tr>
+
+<tr>
+<td><b>Update W₁</b></td>
+<td>
+\[
+W_1 \leftarrow W_1 + \eta\, X^\top \delta_{\text{hidden}}
+\]
+</td>
+<td><pre>W1 += X.T.dot(d_hidden) * lr</pre></td>
+</tr>
+
+</tbody>
+</table>
 
