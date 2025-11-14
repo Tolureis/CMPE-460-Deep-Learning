@@ -1570,3 +1570,132 @@ Handled automatically by autograd
 </tbody>
 </table>
 
+FORMULAS FOR BIAS VARIANCE 
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Concept</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Code Line</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+<td><b>True function</b></td>
+<td>
+\[
+f(x)= e^{\sin(2\pi x)}
+\]
+</td>
+<td><pre>def true_function(x):</pre></td>
+</tr>
+
+<tr>
+<td><b>Noisy data</b></td>
+<td>
+\[
+y_i = f(x_i) + \varepsilon_i,\qquad
+\varepsilon_i \sim \mathcal{N}(0,\sigma_y^2)
+\]
+</td>
+<td><pre>y[i] = true_function(x[i]) + np.random.normal(0, sigma_y)</pre></td>
+</tr>
+
+<tr>
+<td><b>Hidden ReLU-like basis</b></td>
+<td>
+\[
+h_j(x)=\max(0,\; x-\tfrac{j}{n_{\text{hid}}})
+\]
+</td>
+<td><pre>h = line_vals * (line_vals > 0)</pre></td>
+</tr>
+
+<tr>
+<td><b>Model output</b></td>
+<td>
+\[
+\hat{y}(x)= \beta + 
+\sum_{j=1}^{n_{\text{hid}}}
+\omega_j\, h_j(x)
+\]
+</td>
+<td><pre>y += omega[c_hidden] * h;  y += beta</pre></td>
+</tr>
+
+<tr>
+<td><b>Closed-form least squares</b></td>
+<td>
+\[
+\theta = (\mathbf{A}^\top \mathbf{A})^{-1}
+\mathbf{A}^\top \mathbf{y}
+\]
+<br>
+where  
+\[
+\theta = [\beta,\omega_1,\dots,\omega_H]
+\]
+</td>
+<td><pre>beta_omega = np.linalg.lstsq(A, y)[0]</pre></td>
+</tr>
+
+<tr>
+<td><b>Model mean</b></td>
+<td>
+\[
+\mu(x)=\mathbb{E}[\hat{y}(x)]
+\]
+</td>
+<td><pre>mean_model = np.mean(y_model_all, axis=0)</pre></td>
+</tr>
+
+<tr>
+<td><b>Model variance</b></td>
+<td>
+\[
+\mathrm{Var}(x)=
+\mathbb{E}\!\left[(\hat{y}(x)-\mu(x))^2\right]
+\]
+</td>
+<td><pre>std_model = np.std(y_model_all, axis=0)</pre></td>
+</tr>
+
+<tr>
+<td><b>Variance (scalar)</b></td>
+<td>
+\[
+\text{Variance} = 
+\frac{1}{N_x}\sum_x \mathrm{Var}(x)
+\]
+</td>
+<td><pre>variance[c_hidden] = np.mean(std_model**2)</pre></td>
+</tr>
+
+<tr>
+<td><b>Squared bias</b></td>
+<td>
+\[
+\text{Bias} =
+\frac{1}{N_x}\sum_x
+\bigl(\mu(x)-f(x)\bigr)^2
+\]
+</td>
+<td><pre>bias[c_hidden] = np.mean((mean_model - y_func)**2)</pre></td>
+</tr>
+
+<tr>
+<td><b>Total error decomposition</b></td>
+<td>
+\[
+\text{Total} = \text{Bias} + \text{Variance}
+\]
+</td>
+<td><pre>ax.plot(hidden_variables, variance+bias)</pre></td>
+</tr>
+
+</tbody>
+</table>
+
+
