@@ -1430,3 +1430,143 @@ FORMULAS FOR BACKPROPAGATION
 
 </tbody>
 </table>
+
+FORMULAS FOR BACKPROPAGATION WITH PYTORCH
+
+<table border="1" cellpadding="6" style="border-collapse: collapse; width:100%;">
+<thead>
+<tr>
+<th>Equation</th>
+<th>Mathematical Formula (LaTeX)</th>
+<th>Code Implementation</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- Pre-activation -->
+<tr>
+<td><b>Layer pre-activation</b></td>
+<td>
+\[
+\mathbf{z}^{(k)} = \mathbf{a}^{(k-1)} W^{(k)} + \mathbf{b}^{(k)}
+\]
+</td>
+<td>
+<pre>z1 = x @ w1 + b1
+z2 = a1 @ w2 + b2
+z3 = a2 @ w3 + b3
+y_pred = a3 @ w4 + b4</pre>
+</td>
+</tr>
+
+<!-- Activation -->
+<tr>
+<td><b>Layer activation</b></td>
+<td>
+\[
+\mathbf{a}^{(k)} = g(\mathbf{z}^{(k)})
+\]
+where  
+\( g=\sin,\, \exp,\, \cos \)
+</td>
+<td>
+<pre>a1 = torch.sin(z1)
+a2 = torch.exp(torch.clamp(z2, max=4))
+a3 = torch.cos(z3)</pre>
+</td>
+</tr>
+
+<!-- Loss -->
+<tr>
+<td><b>Loss function</b></td>
+<td>
+\[
+L = \frac{1}{N} \sum_i (\hat{y}_i - y_i)^2
+\]
+</td>
+<td>
+<pre>loss = loss_fn(y_pred, y)</pre>
+</td>
+</tr>
+
+<!-- Backprop main chain -->
+<tr>
+<td><b>Backprop chain rule</b></td>
+<td>
+\[
+\frac{\partial L}{\partial W^{(k)}} =
+(\mathbf{a}^{(k-1)})^\top
+\frac{\partial L}{\partial \mathbf{z}^{(k)}}
+\]
+<br>
+\[
+\frac{\partial L}{\partial b^{(k)}} =
+\frac{\partial L}{\partial \mathbf{z}^{(k)}}
+\]
+</td>
+<td>
+<pre>loss.backward()</pre>
+(PyTorch autograd computes all ∂L/∂W and ∂L/∂b)
+</td>
+</tr>
+
+<!-- Activation derivative -->
+<tr>
+<td><b>Activation derivative</b></td>
+<td>
+For each layer:
+\[
+\frac{\partial L}{\partial z^{(k)}}
+=
+\frac{\partial L}{\partial a^{(k)}}
+\odot g'(z^{(k)})
+\]
+<br><br>
+Where:
+\[
+g'(z)=
+\begin{cases}
+\cos(z) & (\sin) \\
+e^z & (\exp) \\
+-\sin(z) & (\cos)
+\end{cases}
+\]
+</td>
+<td>
+Handled automatically by autograd  
+<pre>loss.backward()</pre>
+</td>
+</tr>
+
+<!-- Weight update -->
+<tr>
+<td><b>Weight update rule (Adam)</b></td>
+<td>
+\[
+\theta \leftarrow
+\theta - \alpha \frac{m_t}{\sqrt{v_t}+\epsilon}
+\]
+(Adam update)
+</td>
+<td>
+<pre>optimizer.step()</pre>
+</td>
+</tr>
+
+<!-- Zero grad -->
+<tr>
+<td><b>Gradient reset</b></td>
+<td>
+\[
+\nabla_{\theta} L = 0
+\quad\text{(before next iteration)}
+\]
+</td>
+<td>
+<pre>optimizer.zero_grad()</pre>
+</td>
+</tr>
+
+</tbody>
+</table>
+
