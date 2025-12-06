@@ -7,6 +7,8 @@ These Notebooks has taken from https://github.com/udlbook/udlbook/tree/main/Note
 
 Chap 09-1: https://notebooklm.google.com/notebook/b47c7fb3-818c-4de3-a8c0-42a4c92b5436
 
+Chap 09-2/10-1: https://notebooklm.google.com/notebook/fdacab51-1a14-4535-94ad-3aaa0c3e1985
+
 <h3>LESSON FORMULAS</h3>
 
 Latex formulas can be converted into mathematical expressions with the help of an LLM.
