@@ -11,6 +11,8 @@ Chap 09-2/10-1: https://notebooklm.google.com/notebook/fdacab51-1a14-4535-94ad-3
 
 Chap 10-2/11-1: https://notebooklm.google.com/notebook/93e3f4d2-c088-4da5-b366-c153087c93af
 
+Chap 11-2/12-1: https://notebooklm.google.com/notebook/d595178d-e733-498a-b320-d39c0b9bda69
+
 <h3>LESSON FORMULAS</h3>
 
 Latex formulas can be converted into mathematical expressions with the help of an LLM.
